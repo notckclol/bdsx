@@ -1,4 +1,5 @@
 import { CxxVector } from "../cxxvector";
+import { mce } from "../mce";
 import { MantleClass, nativeClass, NativeClass, nativeField } from "../nativeclass";
 import { bin64_t, bool_t, CxxString, float32_t, int32_t, int8_t, NativeType, uint16_t, uint32_t, uint8_t } from "../nativetype";
 import { ActorRuntimeID, ActorUniqueID } from "./actor";
@@ -28,7 +29,8 @@ export class PlayStatusPacket extends Packet {
 
 @nativeClass(null)
 export class ServerToClientHandshakePacket extends Packet {
-    // no data
+    @nativeField(CxxString)
+    jwt:CxxString;
 }
 
 @nativeClass(null)
@@ -38,26 +40,137 @@ export class ClientToServerHandshakePacket extends Packet {
 
 @nativeClass(null)
 export class DisconnectPacket extends Packet {
+    @nativeField(bool_t)
+    skipMessage:bool_t;
     @nativeField(CxxString, 0x38)
     message:CxxString;
 }
 
-@nativeClass(null)
-export class ResourcePacksInfoPacket extends Packet {
+@nativeClass(0x70)
+export class SemVersion extends NativeClass {
+    @nativeField(uint16_t)
+    major:uint16_t;
+    @nativeField(uint16_t)
+    minor:uint16_t;
+    @nativeField(uint16_t)
+    patch:uint16_t;
+    @nativeField(CxxString, 0x08)
+    preRelease:CxxString;
+    @nativeField(CxxString)
+    buildMeta:CxxString;
+    @nativeField(CxxString)
+    fullVersionString:CxxString;
     @nativeField(bool_t)
-    forcedtoacceot:bool_t;
+    validVersion:bool_t;
+    @nativeField(bool_t)
+    anyVersion:bool_t;
+}
+
+export class BaseGameVersion extends SemVersion {
+}
+
+export enum PackType {
+    Invalid,
+    Addon,
+    Cached,
+    CopyProtected,
+    Behavior,
+    PersonaPiece,
+    Resources,
+    Skins,
+    WorldTemplate,
+    Count,
+}
+
+@nativeClass(0x88)
+export class PackIdVersion extends NativeClass {
+    @nativeField(mce.UUID)
+    uuid:mce.UUID
+    @nativeField(SemVersion, 0x10)
+    version:SemVersion
+    @nativeField(uint8_t)
+    packType:PackType
+}
+
+@nativeClass(0xA8)
+export class PackInstanceId extends NativeClass {
+    @nativeField(PackIdVersion)
+    packId:PackIdVersion;
+    @nativeField(CxxString)
+    subpackName:CxxString;
+}
+
+@nativeClass(0x18)
+export class ContentIdentity extends NativeClass {
+    @nativeField(mce.UUID)
+    uuid:mce.UUID
+    @nativeField(bool_t, 0x10)
+    valid:bool_t
+}
+
+@nativeClass(0xF0)
+export class ResourcePackInfoData extends NativeClass {
+    @nativeField(PackIdVersion)
+    packId:PackIdVersion;
+    @nativeField(bin64_t)
+    packSize:bin64_t;
+    @nativeField(CxxString)
+    contentKey:CxxString;
+    @nativeField(CxxString)
+    subpackName:CxxString;
+    @nativeField(ContentIdentity)
+    contentIdentity:ContentIdentity;
+    @nativeField(bool_t)
+    hasScripts:bool_t;
+    @nativeField(bool_t)
+    hasExceptions:bool_t;
 }
 
 @nativeClass(null)
-export class ResourcePacksStackPacket extends Packet {
+export class ResourcePacksInfoData extends NativeClass {
     @nativeField(bool_t)
-    forcedtoacceot:bool_t;
+    texturePackRequired:bool_t;
+    @nativeField(bool_t)
+    hasScripts:bool_t;
+    @nativeField(bool_t)
+    hasExceptions:bool_t;
+    @nativeField(CxxVector.make(ResourcePackInfoData), 0x08)
+    addOnPacks:CxxVector<ResourcePackInfoData>;
+    @nativeField(CxxVector.make(ResourcePackInfoData), 0x20)
+    texturePacks:CxxVector<ResourcePackInfoData>;
+}
+
+@nativeClass(null)
+export class ResourcePacksInfoPacket extends Packet {
+    @nativeField(ResourcePacksInfoData)
+    data:ResourcePacksInfoData;
+}
+
+@nativeClass(null)
+export class ResourcePackStackPacket extends Packet {
+    @nativeField(CxxVector.make(PackInstanceId))
+    addOnPacks:CxxVector<PackInstanceId>;
+    @nativeField(CxxVector.make(PackInstanceId))
+    texturePacks:CxxVector<PackInstanceId>;
+    @nativeField(BaseGameVersion)
+    baseGameVersion:BaseGameVersion;
+    @nativeField(bool_t)
+    texturePackRequired:bool_t;
+    @nativeField(bool_t)
+    experimental:bool_t;
+}
+
+export enum ResourcePackResponse {
+    Cancel = 1,
+    Downloading,
+    DownloadingFinished,
+    ResourcePackStackFinished,
 }
 
 @nativeClass(null)
 export class ResourcePackClientResponsePacket extends Packet {
-    @nativeField(bool_t)
-    forcedtoacceot:bool_t;
+    @nativeField(uint8_t, 0x40)
+    response: ResourcePackResponse;
 }
 
 @nativeClass(null)
