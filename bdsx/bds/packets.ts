@@ -1512,7 +1512,7 @@ export const PacketIdToType = {
     0x04: ClientToServerHandshakePacket,
     0x05: DisconnectPacket,
     0x06: ResourcePacksInfoPacket,
-    0x07: ResourcePacksStackPacket,
+    0x07: ResourcePackStackPacket,
     0x08: ResourcePackClientResponsePacket,
     0x09: TextPacket,
     0x0a: SetTimePacket,
