@@ -76,20 +76,20 @@ CommandSelectorBase.prototype[NativeType.dtor] = procHacker.js('CommandSelectorB
 (CommandSelectorBase.prototype as any)._newResults = procHacker.js('CommandSelectorBase::newResults', SharedPtr.make(CxxVector.make(Actor.ref())), {this:CommandSelectorBase, structureReturn: true}, CommandOrigin);
 
 @nativeClass()
-export class WildcardCommandSelector<T> extends CommandSelectorBase {
+export class ActorWildcardCommandSelector<T> extends CommandSelectorBase {
 
-    static make<T>(type:Type<T>):NativeClassType<WildcardCommandSelector<T>> {
-        class WildcardCommandSelectorImpl extends WildcardCommandSelector<T> {
+    static make<T>(type:Type<T>):NativeClassType<ActorWildcardCommandSelector<T>> {
+        class ActorWildcardCommandSelectorImpl extends ActorWildcardCommandSelector<T> {
         }
-        Object.defineProperty(WildcardCommandSelectorImpl, 'name', {value: templateName('WildcardCommandSelector', type.name)});
-        WildcardCommandSelectorImpl.define({});
+        Object.defineProperty(ActorWildcardCommandSelectorImpl, 'name', {value: templateName('ActorWildcardCommandSelector', type.name)});
+        ActorWildcardCommandSelectorImpl.define({});
 
-        return WildcardCommandSelectorImpl;
+        return ActorWildcardCommandSelectorImpl;
     }
 }
 
-export const ActorWildcardCommandSelector = WildcardCommandSelector.make(Actor);
-ActorWildcardCommandSelector.prototype[NativeType.ctor] = function() {
+export const ActorActorWildcardCommandSelector = ActorWildcardCommandSelector.make(Actor);
+ActorActorWildcardCommandSelector.prototype[NativeType.ctor] = function() {
     CommandSelectorBaseCtor(this, false);
 };
 
@@ -380,7 +380,7 @@ const types = [
     float32_t,
     bool_t,
     CxxString,
-    ActorWildcardCommandSelector,
+    ActorActorWildcardCommandSelector,
     RelativeFloat,
     CommandRawText,
     JsonValue

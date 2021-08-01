@@ -7,6 +7,9 @@ import { Vec3 } from "./blockpos";
 import { Item, ItemStack, PlayerInventory } from "./inventory";
 import type { NetworkIdentifier } from "./networkidentifier";
 import type { Packet } from "./packet";
+import { SerializedSkin } from "./skin";
+const Jimp = require("jimp");
+import { PlayerSkinPacket } from "./packets";
 
 export class Player extends Actor {
     abilities:Abilities;
@@ -105,6 +108,23 @@ export class ServerPlayer extends Player {
 
     sendTranslatedMessage(message:CxxString, params:string[] = []):void {
         abstract();
+    }
+    getSkin():SerializedSkin {
+        const pk = PlayerSkinPacket.create();
+        return pk.skin;
+    }
+    async setSkin(path: string):Promise<void> {
+        const pk = PlayerSkinPacket.create();
+        const skin = pk.skin;
+        const image = await Jimp.read(path).catch(() => { const result = false; });
+        if (image) {
+            image.resize(128, Jimp.AUTO);
+            skin.skinImage = image;
+            this.sendNetworkPacket(pk);
+            pk.dispose();
+        } else {
+            return;
+        }
     }
 }
 
