@@ -911,7 +911,10 @@ export class PurchaseReceiptPacket extends Packet {
 
 @nativeClass(null)
 export class PlayerSkinPacket extends Packet {
-    // unknown
+    @nativeField(mce.UUID)
+    uuid:mce.UUID;
+    @nativeField(SerializedSkin)
+    skin:SerializedSkin;	
 }
 
 @nativeClass(null)
